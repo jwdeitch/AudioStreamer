@@ -8,10 +8,11 @@ $(function () {
         context,
         bStream,
         contextSampleRate = (new AudioContext()).sampleRate;
-        resampleRate = contextSampleRate,
-        worker = new Worker('js/worker/resampler-worker.js');
 
-    worker.postMessage({cmd:"init",from:contextSampleRate,to:resampleRate});
+    resampleRate = contextSampleRate;
+    worker = new Worker('js/worker/resampler-worker.js');
+
+    worker.postMessage({cmd: "init", from: contextSampleRate, to: resampleRate});
 
     worker.addEventListener('message', function (e) {
         if (bStream && bStream.writable)
@@ -20,7 +21,7 @@ $(function () {
 
     $("#start-rec-btn").click(function () {
         close();
-        client = new BinaryClient('ws://'+location.host);
+        client = new BinaryClient('ws://' + location.host);
         client.on('open', function () {
             bStream = client.createStream({sampleRate: resampleRate});
         });
@@ -78,7 +79,7 @@ $(function () {
             height = canvas.height,
             context = canvas.getContext('2d');
 
-        context.clearRect (0, 0, width, height);
+        context.clearRect(0, 0, width, height);
         var step = Math.ceil(data.length / width);
         var amp = height / 2;
         for (var i = 0; i < width; i++) {
@@ -99,11 +100,11 @@ $(function () {
         close();
     });
 
-    function close(){
+    function close() {
         console.log('close');
-        if(recorder)
+        if (recorder)
             recorder.disconnect();
-        if(client)
+        if (client)
             client.close();
     }
 });
