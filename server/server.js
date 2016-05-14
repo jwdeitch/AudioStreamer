@@ -2,7 +2,7 @@
  * Created by noamc on 8/31/14.
  */
 var binaryServer = require('binaryjs').BinaryServer,
-    https = require('https'),
+    http = require('http'),
     wav = require('wav'),
     opener = require('opener'),
     fs = require('fs'),
@@ -15,23 +15,18 @@ var uaParser = new UAParser();
 if(!fs.existsSync("recordings"))
     fs.mkdirSync("recordings");
 
-var options = {
-    key:    fs.readFileSync('ssl/server.key'),
-    cert:   fs.readFileSync('ssl/server.crt'),
-};
-
 var app = connect();
 
 app.use(serveStatic('public'));
 
-var server = https.createServer(options,app);
-server.listen(9191);
+var httpServer = http.createServer(app);
+httpServer.listen(8080);
 
-opener("https://localhost:9191");
+opener("http://localhost:8080");
 
-var server = binaryServer({server:server});
+var wsServer = binaryServer({server:httpServer});
 
-server.on('connection', function(client) {
+wsServer.on('connection', function(client) {
     console.log("new connection...");
     var fileWriter = null;
 
@@ -42,7 +37,7 @@ server.on('connection', function(client) {
     client.on('stream', function(stream, meta) {
 
         console.log("Stream Start@" + meta.sampleRate +"Hz");
-        var fileName = "recordings/"+ ua.os.name +"-"+ ua.os.version +"_"+ new Date().getTime()  + ".wav"
+        var fileName = "recordings/"+ ua.os.name +"-"+ ua.os.version +"_"+ new Date().getTime()  + ".wav";
         fileWriter = new wav.FileWriter(fileName, {
             channels: 1,
             sampleRate: meta.sampleRate,

@@ -20,7 +20,7 @@ $(function () {
 
     $("#start-rec-btn").click(function () {
         close();
-        client = new BinaryClient('wss://'+location.host);
+        client = new BinaryClient('ws://'+location.host);
         client.on('open', function () {
             bStream = client.createStream({sampleRate: resampleRate});
         });
