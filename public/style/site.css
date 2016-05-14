@@ -11,3 +11,7 @@
 #icon{
     height: 40px;
 }
+
+#canvas-container {
+    display: inline-block;
+}

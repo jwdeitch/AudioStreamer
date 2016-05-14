@@ -8,19 +8,19 @@ $(function () {
         context,
         bStream,
         contextSampleRate = (new AudioContext()).sampleRate;
-        resampleRate = contextSampleRate,
-        worker = new Worker('js/worker/resampler-worker.js');
+    resampleRate = contextSampleRate;
+    worker = new Worker('js/worker/resampler-worker.js');
 
-    worker.postMessage({cmd:"init",from:contextSampleRate,to:resampleRate});
+    worker.postMessage({cmd: "init", from: contextSampleRate, to: resampleRate});
 
     worker.addEventListener('message', function (e) {
         if (bStream && bStream.writable)
             bStream.write(convertFloat32ToInt16(e.data.buffer));
     }, false);
 
-    $("#start-rec-btn").click(function () {
-        close();
-        client = new BinaryClient('ws://'+location.host);
+    $(document.body).on('click', '.start-rec-btn', function () {
+        $(this).removeClass('start-rec-btn').addClass('btn-danger').removeClass('btn-primary').addClass('stop-rec-btn').text('Stop Recording');
+        client = new BinaryClient('ws://' + location.host);
         client.on('open', function () {
             bStream = client.createStream({sampleRate: resampleRate});
         });
@@ -78,7 +78,7 @@ $(function () {
             height = canvas.height,
             context = canvas.getContext('2d');
 
-        context.clearRect (0, 0, width, height);
+        context.clearRect(0, 0, width, height);
         var step = Math.ceil(data.length / width);
         var amp = height / 2;
         for (var i = 0; i < width; i++) {
@@ -95,15 +95,16 @@ $(function () {
         }
     }
 
-    $("#stop-rec-btn").click(function () {
+    $(document.body).on('click', '.stop-rec-btn', function () {
+        $(this).removeClass('stop-rec-btn').removeClass('btn-danger').addClass('btn-primary').addClass('start-rec-btn').text('Start Recording');
         close();
     });
 
-    function close(){
+    function close() {
         console.log('close');
-        if(recorder)
+        if (recorder)
             recorder.disconnect();
-        if(client)
+        if (client)
             client.close();
     }
 });
