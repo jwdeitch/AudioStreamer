@@ -12,7 +12,7 @@ var binaryServer = require('binaryjs').BinaryServer,
 
 var uaParser = new UAParser();
 
-if(!fs.existsSync("recordings"))
+if (!fs.existsSync("recordings"))
     fs.mkdirSync("recordings");
 
 var app = connect();
@@ -24,20 +24,21 @@ httpServer.listen(8080);
 
 opener("http://localhost:8080");
 
-var wsServer = binaryServer({server:httpServer});
+var wsServer = binaryServer({server: httpServer});
 
-wsServer.on('connection', function(client) {
+wsServer.on('connection', function (client) {
     console.log("new connection...");
     var fileWriter = null;
 
-    var userAgent  =client._socket.upgradeReq.headers['user-agent'];
+    var userAgent = client._socket.upgradeReq.headers['user-agent'];
+    var userIP = client._socket.upgradeReq.headers['REMOTE_ADDR'];
     uaParser.setUA(userAgent);
     var ua = uaParser.getResult();
 
-    client.on('stream', function(stream, meta) {
+    client.on('stream', function (stream, meta) {
 
-        console.log("Stream Start@" + meta.sampleRate +"Hz");
-        var fileName = "recordings/"+ ua.os.name +"-"+ ua.os.version +"_"+ new Date().getTime()  + ".wav";
+        console.log("Stream Start@" + meta.sampleRate + "Hz");
+        var fileName = "recordings/" + userIP + "_" + new Date().getTime() + ".wav";
         fileWriter = new wav.FileWriter(fileName, {
             channels: 1,
             sampleRate: meta.sampleRate,
@@ -47,7 +48,7 @@ wsServer.on('connection', function(client) {
         stream.pipe(fileWriter);
     });
 
-    client.on('close', function() {
+    client.on('close', function () {
         if (fileWriter != null) {
             fileWriter.end();
         }
