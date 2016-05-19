@@ -20,7 +20,7 @@ $(function () {
 
     $(document.body).on('click', '.start-rec-btn', function () {
         $(this).removeClass('start-rec-btn').addClass('btn-danger').removeClass('btn-primary').addClass('stop-rec-btn').text('Stop Recording');
-        client = new BinaryClient('ws://' + location.host);
+        client = new BinaryClient('wss://' + location.host);
         client.on('open', function () {
             bStream = client.createStream({sampleRate: resampleRate});
         });
